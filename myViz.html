@@ -7,33 +7,80 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
             text-align: center;
+            margin: 20px;
         }
-        .visualization {
-            width: 80%;
-            height: 400px;
-            border: 2px solid #333;
-            margin: 20px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            font-size: 1.5em;
-            background-color: #f9f9f9;
+        text {
+            font-family: sans-serif;
+            font-size: 12px;
+            fill: white;
         }
     </style>
 </head>
 <body>
     <h1>Welcome to myViz Page</h1>
-    <p>Here you can see visualizations and other content I’m experimenting with!</p>
-    
-    <!-- Placeholder for a visualization -->
-    <div class="visualization">
-        Visualization Placeholder
-    </div>
+    <p>Here is a simple pie chart created with D3.js:</p>
+
+    <!-- Load D3.js library from a CDN -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- D3.js Script for Pie Chart -->
+    <script type="text/javascript">
+        // Set the dimensions of the SVG container
+        var width = 300;
+        var height = 300;
+        
+        // Sample data array representing different sections of the pie chart
+        var dataset = [5, 10, 20, 45, 6, 25];
+
+        // Define the radius for the pie chart's inner and outer circles
+        var outerRadius = width / 2;  // Full radius of the pie
+        var innerRadius = 0;          // 0 for a full pie (not a donut chart)
+        
+        // Create the arc generator for defining the shape of each slice
+        var arc = d3.arc()
+                    .innerRadius(innerRadius)
+                    .outerRadius(outerRadius);
+        
+        // Define the pie layout to transform data into start and end angles for each slice
+        var pie = d3.pie();
+        
+        // Set up a color scale using 10-step ordinal scale from D3
+        var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        // Create the SVG container for the pie chart
+        var svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+        // Groups each pie slice in an SVG group element and position at the chart center
+        var arcs = svg.selectAll("g.arc")
+                      .data(pie(dataset))
+                      .enter()
+                      .append("g")
+                      .attr("class", "arc")
+                      .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+        
+        // Draws each slice of the pie chart as a path element
+        arcs.append("path")
+            .attr("fill", function(d, i) {
+                return color(i);  // Assign color based on index
+            })
+            .attr("d", arc);     // Use the arc generator to set the path
+
+        // this adds labels to each slice
+        arcs.append("text")
+            .attr("transform", function(d) {
+                return "translate(" + arc.centroid(d) + ")";  // Position label at the slice center
+            })
+            .attr("text-anchor", "middle")
+            .text(function(d) {
+                return d.value;  // Display the data value inside each slice
+            });
+    </script>
 
     <p><a href="index.html">Back to Home Page</a></p>
 </body>
 </html>
+
