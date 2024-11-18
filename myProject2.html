@@ -39,12 +39,12 @@
     <svg width="900" height="600"></svg>
     <div class="tooltip" style="opacity: 0;"></div>
     <script>
-        // Load the data
+        // Loads the dataset
         d3.csv("us-state-populations.csv").then(data => {
             // Parse the population as numbers and format data
             data.forEach(d => d.pop_2014 = +d.pop_2014);
 
-            // Set up SVG canvas
+            // Sets up SVG canvas
             const svg = d3.select("svg"),
                 margin = { top: 20, right: 30, bottom: 100, left: 60 },
                 width = svg.attr("width") - margin.left - margin.right,
