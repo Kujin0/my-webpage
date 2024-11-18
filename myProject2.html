@@ -22,11 +22,22 @@
         svg {
             margin-top: 20px;
         }
+        .tooltip {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 5px;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 0.9rem;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
     <h1>US State Populations (2014)</h1>
     <svg width="900" height="600"></svg>
+    <div class="tooltip" style="opacity: 0;"></div>
     <script>
         // Load the data
         d3.csv("us-state-populations.csv").then(data => {
@@ -41,6 +52,9 @@
 
             const g = svg.append("g")
                 .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Tooltip
+            const tooltip = d3.select(".tooltip");
 
             // Scales
             const x = d3.scaleBand()
@@ -70,13 +84,31 @@
                 .enter().append("rect")
                 .attr("class", "bar")
                 .attr("x", d => x(d.state))
-                .attr("y", d => y(d.pop_2014))
+                .attr("y", height) // Start bars at the bottom
                 .attr("width", x.bandwidth())
-                .attr("height", d => height - y(d.pop_2014))
-                .attr("fill", "#007bff");
+                .attr("height", 0) // Bars have zero height initially
+                .attr("fill", "#007bff")
+                // Animate bars growing
+                .transition()
+                .duration(800)
+                .attr("y", d => y(d.pop_2014))
+                .attr("height", d => height - y(d.pop_2014));
+
+            // Add hover interactivity
+            g.selectAll(".bar")
+                .on("mouseover", (event, d) => {
+                    tooltip.transition().duration(200).style("opacity", 1);
+                    tooltip.html(`<strong>${d.state}</strong><br>Population: ${d3.format(",")(d.pop_2014)}`)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", () => {
+                    tooltip.transition().duration(500).style("opacity", 0);
+                });
         }).catch(error => {
             console.error("Error loading the CSV file:", error);
         });
     </script>
 </body>
 </html>
+
