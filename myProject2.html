@@ -26,16 +26,16 @@
 </head>
 <body>
     <h1>US State Populations (2014)</h1>
-    <svg width="800" height="500"></svg>
+    <svg width="900" height="600"></svg>
     <script>
         // Load the data
         d3.csv("us-state-populations.csv").then(data => {
-            // Parse the population as numbers
-            data.forEach(d => d.population = +d.population);
+            // Parse the population as numbers and format data
+            data.forEach(d => d.pop_2014 = +d.pop_2014);
 
             // Set up SVG canvas
             const svg = d3.select("svg"),
-                margin = { top: 20, right: 30, bottom: 40, left: 60 },
+                margin = { top: 20, right: 30, bottom: 100, left: 60 },
                 width = svg.attr("width") - margin.left - margin.right,
                 height = svg.attr("height") - margin.top - margin.bottom;
 
@@ -49,7 +49,8 @@
                 .padding(0.1);
 
             const y = d3.scaleLinear()
-                .domain([0, d3.max(data, d => d.population)])
+                .domain([0, d3.max(data, d => d.pop_2014)])
+                .nice()
                 .range([height, 0]);
 
             // Axes
@@ -57,11 +58,11 @@
                 .attr("transform", `translate(0,${height})`)
                 .call(d3.axisBottom(x))
                 .selectAll("text")
-                .attr("transform", "rotate(-40)")
+                .attr("transform", "rotate(-45)")
                 .style("text-anchor", "end");
 
             g.append("g")
-                .call(d3.axisLeft(y));
+                .call(d3.axisLeft(y).ticks(10, "s"));
 
             // Bars
             g.selectAll(".bar")
@@ -69,9 +70,9 @@
                 .enter().append("rect")
                 .attr("class", "bar")
                 .attr("x", d => x(d.state))
-                .attr("y", d => y(d.population))
+                .attr("y", d => y(d.pop_2014))
                 .attr("width", x.bandwidth())
-                .attr("height", d => height - y(d.population))
+                .attr("height", d => height - y(d.pop_2014))
                 .attr("fill", "#007bff");
         }).catch(error => {
             console.error("Error loading the CSV file:", error);
