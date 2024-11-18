@@ -43,7 +43,7 @@
       .attr("height", height);
 
     // Load data
-    d3.csv("pop_2014.csv").then(data => {
+    d3.csv("us-state-populations.csv").then(data => {
       // Parse the population as a number
       data.forEach(d => d.pop_2014 = +d.pop_2014);
 
