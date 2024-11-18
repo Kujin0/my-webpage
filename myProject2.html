@@ -1,106 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>State Populations 2014</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    .bar {
-      fill: steelblue;
-      transition: fill 0.3s;
-    }
-    .bar:hover {
-      fill: orange;
-    }
-    .tooltip {
-      position: absolute;
-      background: white;
-      padding: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      pointer-events: none;
-      visibility: hidden;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US State Populations (2014)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin-top: 20px;
+            font-size: 2rem;
+        }
+        svg {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>U.S. State Populations (2014)</h1>
-  <svg id="chart"></svg>
-  <script>
-    // Chart dimensions
-    const width = 800;
-    const height = 500;
-    const margin = { top: 20, right: 30, bottom: 50, left: 70 };
+    <h1>US State Populations (2014)</h1>
+    <svg width="800" height="500"></svg>
+    <script>
+        // Load the data
+        d3.csv("us-state-populations.csv").then(data => {
+            // Parse the population as numbers
+            data.forEach(d => d.population = +d.population);
 
-    // Create SVG canvas
-    const svg = d3.select("#chart")
-      .attr("width", width)
-      .attr("height", height);
+            // Set up SVG canvas
+            const svg = d3.select("svg"),
+                margin = { top: 20, right: 30, bottom: 40, left: 60 },
+                width = svg.attr("width") - margin.left - margin.right,
+                height = svg.attr("height") - margin.top - margin.bottom;
 
-    // Load data
-    d3.csv("us-state-populations.csv").then(data => {
-      // Parse the population as a number
-      data.forEach(d => d.pop_2014 = +d.pop_2014);
+            const g = svg.append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // Define scales
-      const x = d3.scaleBand()
-        .domain(data.map(d => d.states)) // Use 'states' column for x-axis
-        .range([margin.left, width - margin.right])
-        .padding(0.1);
+            // Scales
+            const x = d3.scaleBand()
+                .domain(data.map(d => d.state))
+                .range([0, width])
+                .padding(0.1);
 
-      const y = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.pop_2014)]) // Use 'pop_2014' column for y-axis
-        .nice()
-        .range([height - margin.bottom, margin.top]);
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.population)])
+                .range([height, 0]);
 
-      // Draw bars
-      svg.selectAll(".bar")
-        .data(data)
-        .enter()
-        .append("rect")
-        .attr("class", "bar")
-        .attr("x", d => x(d.states))
-        .attr("y", height - margin.bottom) // Start bars at the bottom
-        .attr("width", x.bandwidth())
-        .attr("height", 0) // Start with height = 0
-        .transition()
-        .duration(800)
-        .attr("y", d => y(d.pop_2014)) // Animate to the correct position
-        .attr("height", d => height - margin.bottom - y(d.pop_2014));
+            // Axes
+            g.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll("text")
+                .attr("transform", "rotate(-40)")
+                .style("text-anchor", "end");
 
-      // Add x-axis
-      svg.append("g")
-        .attr("transform", `translate(0,${height - margin.bottom})`)
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-        .attr("transform", "rotate(-45)")
-        .style("text-anchor", "end");
+            g.append("g")
+                .call(d3.axisLeft(y));
 
-      // Add y-axis
-      svg.append("g")
-        .attr("transform", `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y).tickFormat(d => d3.format(",")(d))); // Format with commas
-
-      // Add tooltip
-      const tooltip = d3.select("body").append("div")
-        .attr("class", "tooltip");
-
-      svg.selectAll(".bar")
-        .on("mouseover", (event, d) => {
-          tooltip.style("visibility", "visible")
-            .text(`${d.states}: ${d3.format(",")(d.pop_2014)}`);
-        })
-        .on("mousemove", event => {
-          tooltip.style("top", `${event.pageY - 10}px`)
-            .style("left", `${event.pageX + 10}px`);
-        })
-        .on("mouseout", () => tooltip.style("visibility", "hidden"));
-    });
-  </script>
+            // Bars
+            g.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d.state))
+                .attr("y", d => y(d.population))
+                .attr("width", x.bandwidth())
+                .attr("height", d => height - y(d.population))
+                .attr("fill", "#007bff");
+        }).catch(error => {
+            console.error("Error loading the CSV file:", error);
+        });
+    </script>
 </body>
 </html>
