@@ -51,19 +51,19 @@
     <h1>Final Project Visualizations</h1>
     <div class="container">
         <div class="visualization">
-            <img src="visualization1.png" alt="Visualization 1">
+            <img src="Sheet 1 (5).png" alt="Visualization 1">
             <p>Description of Visualization 1</p>
         </div>
         <div class="visualization">
-            <img src="visualization2.png" alt="Visualization 2">
+            <img src="Sheet 2.png" alt="Visualization 2">
             <p>Description of Visualization 2</p>
         </div>
         <div class="visualization">
-            <img src="visualization3.png" alt="Visualization 3">
+            <img src="Sheet 3 (2).png" alt="Visualization 3">
             <p>Description of Visualization 3</p>
         </div>
         <div class="visualization">
-            <img src="visualization4.png" alt="Visualization 4">
+            <img src="Sheet 4.png" alt="Visualization 4">
             <p>Description of Visualization 4</p>
         </div>
     </div>
